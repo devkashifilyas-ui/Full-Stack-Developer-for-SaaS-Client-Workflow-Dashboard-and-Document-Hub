@@ -256,10 +256,3 @@ This project demonstrates how to build:
 
 The demo is intentionally designed to look and behave like a real
 product foundation rather than a simple admin template.
-
-------------------------------------------------------------------------
-
-## Author
-
-Kashif Ilyas\
-Full Stack Engineer
