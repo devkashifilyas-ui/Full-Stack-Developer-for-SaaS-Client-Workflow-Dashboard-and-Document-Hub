@@ -1,0 +1,1171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WorkflowOS — Client Workflow Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,400;0,600;1,300&family=Geist+Mono:wght@400;500&family=Geist:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f5f4f1;
+  --bg2: #eeede9;
+  --surface: #ffffff;
+  --surface2: #f9f8f6;
+  --border: #e2e0da;
+  --border2: #ccc9c0;
+  --text: #3d3a34;
+  --text2: #8a8680;
+  --text3: #b5b2ab;
+  --dark: #1a1916;
+  --ink: #252320;
+  --sage: #6b8c72;
+  --sage2: #4d6b54;
+  --amber: #c97a2a;
+  --amber2: #a8631e;
+  --sky: #4a7fa8;
+  --rose: #b85c5c;
+  --violet: #7262a8;
+  --mono: 'Geist Mono', monospace;
+  --display: 'Fraunces', serif;
+  --body: 'Geist', sans-serif;
+  --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow2: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+html,body { height:100%; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--body);
+  font-size: 13.5px;
+  display: flex;
+  overflow: hidden;
+  height: 100vh;
+}
+
+/* ─── Sidebar ─── */
+#sidebar {
+  width: 224px;
+  min-width: 224px;
+  background: var(--dark);
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow-y: auto;
+}
+
+.logo-wrap {
+  padding: 22px 20px 16px;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+}
+.logo {
+  font-family: var(--display);
+  font-size: 19px;
+  font-weight: 600;
+  color: #fff;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+.logo em { font-style: italic; font-weight: 300; color: rgba(255,255,255,0.5); }
+.logo-version {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: rgba(255,255,255,0.25);
+  letter-spacing: 0.1em;
+  margin-top: 5px;
+}
+
+.workspace-selector {
+  margin: 10px 14px;
+  padding: 8px 10px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 6px;
+  border: 1px solid rgba(255,255,255,0.06);
+  display: flex; align-items: center; gap: 8px;
+  cursor: pointer;
+}
+.ws-avatar {
+  width: 22px; height: 22px;
+  background: linear-gradient(135deg, #c97a2a, #b85c5c);
+  border-radius: 5px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--display);
+  font-size: 10px; font-weight: 600; color: #fff;
+  flex-shrink: 0;
+}
+.ws-name { font-size: 12px; color: rgba(255,255,255,0.7); flex: 1; }
+.ws-chevron { font-size: 10px; color: rgba(255,255,255,0.3); }
+
+nav { flex: 1; padding: 8px 0; }
+.nav-group { padding: 12px 14px 4px; font-family: var(--mono); font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255,255,255,0.22); }
+.nav-item {
+  display: flex; align-items: center; gap: 9px;
+  padding: 8px 14px;
+  cursor: pointer;
+  color: rgba(255,255,255,0.45);
+  font-size: 13px;
+  transition: all 0.15s;
+  border-left: 2px solid transparent;
+  border-radius: 0 5px 5px 0;
+  margin-right: 10px;
+}
+.nav-item:hover { color: rgba(255,255,255,0.8); background: rgba(255,255,255,0.05); }
+.nav-item.active { color: #fff; border-left-color: #c97a2a; background: rgba(201,122,42,0.12); }
+.nav-icon { width: 16px; text-align: center; font-size: 13px; }
+.nav-count {
+  margin-left: auto;
+  font-family: var(--mono); font-size: 9px;
+  padding: 2px 5px; border-radius: 3px;
+  background: rgba(255,255,255,0.08);
+  color: rgba(255,255,255,0.35);
+}
+.nav-count.alert { background: rgba(201,122,42,0.2); color: #c97a2a; }
+
+.sidebar-user {
+  padding: 14px 16px;
+  border-top: 1px solid rgba(255,255,255,0.07);
+  display: flex; align-items: center; gap: 10px;
+}
+.su-avatar {
+  width: 28px; height: 28px;
+  background: linear-gradient(135deg, var(--sage), var(--sky));
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--display);
+  font-size: 11px; color: #fff; font-weight: 600;
+  flex-shrink: 0;
+}
+.su-name { font-size: 12px; color: rgba(255,255,255,0.6); }
+.su-role { font-size: 10px; color: rgba(255,255,255,0.28); font-family: var(--mono); }
+.su-badge {
+  margin-left: auto;
+  font-family: var(--mono); font-size: 8px;
+  padding: 2px 5px; border-radius: 3px;
+  background: rgba(107,140,114,0.2);
+  color: #7aaa84;
+  border: 1px solid rgba(107,140,114,0.25);
+}
+
+/* ─── Main ─── */
+#main {
+  flex: 1;
+  overflow-y: auto;
+  height: 100vh;
+}
+
+.view { display: none; animation: fadeIn 0.2s ease; }
+.view.active { display: block; }
+@keyframes fadeIn { from{opacity:0;transform:translateY(5px);} to{opacity:1;transform:none;} }
+
+/* ─── Top bar ─── */
+.topbar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 28px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  position: sticky; top: 0; z-index: 10;
+}
+.topbar-title { font-family: var(--display); font-size: 16px; font-weight: 600; color: var(--ink); letter-spacing: -0.01em; }
+.topbar-sub { font-size: 12px; color: var(--text2); margin-top: 1px; }
+.topbar-actions { display: flex; gap: 8px; align-items: center; }
+
+/* ─── Buttons ─── */
+.btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 7px 14px; border-radius: 6px;
+  font-size: 12.5px; font-weight: 500; cursor: pointer; border: none;
+  font-family: var(--body); transition: all 0.15s;
+}
+.btn-primary { background: var(--ink); color: #fff; }
+.btn-primary:hover { background: #333; }
+.btn-ghost { background: transparent; color: var(--text2); border: 1px solid var(--border2); }
+.btn-ghost:hover { color: var(--text); border-color: var(--text3); }
+
+/* ─── Content padding ─── */
+.content { padding: 24px 28px 60px; }
+
+/* ─── Stat cards ─── */
+.stats-row { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; margin-bottom: 22px; }
+.stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px 18px;
+  box-shadow: var(--shadow);
+}
+.stat-label { font-family: var(--mono); font-size: 9px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text2); margin-bottom: 6px; }
+.stat-val { font-family: var(--display); font-size: 30px; font-weight: 600; color: var(--ink); line-height: 1; }
+.stat-val.sage { color: var(--sage2); }
+.stat-val.amber { color: var(--amber); }
+.stat-val.rose { color: var(--rose); }
+.stat-delta { font-size: 11px; color: var(--text2); margin-top: 5px; }
+.stat-delta span { color: var(--sage2); }
+
+/* ─── Grid ─── */
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+.mt16 { margin-top: 16px; }
+.mt20 { margin-top: 20px; }
+.mt24 { margin-top: 24px; }
+
+/* ─── Cards ─── */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+}
+.card-header {
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.card-title { font-size: 13px; font-weight: 600; color: var(--ink); }
+.card-sub { font-size: 11px; color: var(--text2); }
+.card-body { padding: 14px 18px; }
+
+/* ─── Tags ─── */
+.tag {
+  display: inline-flex; align-items: center;
+  font-family: var(--mono); font-size: 9px;
+  padding: 2px 7px; border-radius: 3px; letter-spacing: 0.04em;
+}
+.tag-sage   { background: rgba(107,140,114,0.1);  color: var(--sage2); border: 1px solid rgba(107,140,114,0.2); }
+.tag-amber  { background: rgba(201,122,42,0.1);   color: var(--amber); border: 1px solid rgba(201,122,42,0.2); }
+.tag-rose   { background: rgba(184,92,92,0.1);    color: var(--rose);  border: 1px solid rgba(184,92,92,0.2); }
+.tag-sky    { background: rgba(74,127,168,0.1);   color: var(--sky);   border: 1px solid rgba(74,127,168,0.2); }
+.tag-violet { background: rgba(114,98,168,0.1);   color: var(--violet);border: 1px solid rgba(114,98,168,0.2); }
+.tag-neutral{ background: var(--surface2);        color: var(--text2); border: 1px solid var(--border); }
+
+/* ─── Status badges ─── */
+.status-badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 11.5px; font-weight: 500;
+  padding: 3px 9px; border-radius: 20px;
+}
+.sb-intake    { background: rgba(74,127,168,0.08);  color: var(--sky);   border: 1px solid rgba(74,127,168,0.2); }
+.sb-review    { background: rgba(201,122,42,0.08);  color: var(--amber); border: 1px solid rgba(201,122,42,0.2); }
+.sb-docs      { background: rgba(114,98,168,0.08);  color: var(--violet);border: 1px solid rgba(114,98,168,0.2); }
+.sb-approval  { background: rgba(107,140,114,0.08); color: var(--sage2); border: 1px solid rgba(107,140,114,0.2); }
+.sb-final     { background: rgba(201,122,42,0.08);  color: #c97a2a;      border: 1px solid rgba(201,122,42,0.2); }
+.sb-completed { background: rgba(107,140,114,0.1);  color: var(--sage2); border: 1px solid rgba(107,140,114,0.25); }
+.sb-dot { width:5px;height:5px;border-radius:50%;background:currentColor; }
+
+/* ─── Records table ─── */
+.records-table { width:100%;border-collapse:collapse; }
+.records-table th {
+  text-align:left; padding:9px 14px;
+  font-family:var(--mono); font-size:9px; letter-spacing:0.1em; text-transform:uppercase;
+  color:var(--text2); border-bottom:1px solid var(--border); background:var(--surface2);
+  white-space:nowrap;
+}
+.records-table td { padding:11px 14px; border-bottom:1px solid var(--border); }
+.records-table tr:last-child td { border-bottom:none; }
+.records-table tr.clickable { cursor:pointer; }
+.records-table tr.clickable:hover td { background:var(--surface2); }
+.rec-name { font-size:13px; font-weight:600; color:var(--ink); }
+.rec-client { font-size:11px; color:var(--text2); margin-top:1px; }
+.rec-id { font-family:var(--mono); font-size:10px; color:var(--text3); }
+.pri-dot { width:7px;height:7px;border-radius:50%;display:inline-block; }
+.pri-high { background:var(--rose); }
+.pri-med  { background:var(--amber); }
+.pri-low  { background:var(--text3); }
+
+/* ─── Progress bar ─── */
+.prog-bar { height:4px; background:var(--border); border-radius:2px; overflow:hidden; }
+.prog-fill { height:100%; background:var(--sage2); border-radius:2px; transition:width 0.4s ease; }
+
+/* ─── Workflow stages ─── */
+.stage-track { display:flex; gap:0; margin: 4px 0; }
+.stage-step {
+  flex:1; padding:10px 12px; border-top:3px solid var(--border);
+  font-family:var(--mono); font-size:9px; letter-spacing:0.06em; text-transform:uppercase;
+  color:var(--text3); position:relative;
+}
+.stage-step.done { border-top-color:var(--sage2); color:var(--sage2); }
+.stage-step.active { border-top-color:var(--amber); color:var(--amber); background:rgba(201,122,42,0.04); }
+.stage-step .check { font-size:10px; margin-right:3px; }
+.stage-step-label { font-size:11px; font-weight:500; margin-top:3px; color:inherit; }
+
+/* ─── Task items ─── */
+.task-item {
+  display:flex; align-items:flex-start; gap:10px;
+  padding:10px 0; border-bottom:1px solid var(--border);
+}
+.task-item:last-child { border-bottom:none; }
+.task-check {
+  width:16px; height:16px; border-radius:4px; border:1.5px solid var(--border2);
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; flex-shrink:0; margin-top:1px; transition:all 0.15s;
+  font-size:9px;
+}
+.task-check.done { background:var(--sage2); border-color:var(--sage2); color:#fff; }
+.task-title { font-size:13px; color:var(--ink); flex:1; line-height:1.4; }
+.task-title.done { text-decoration:line-through; color:var(--text2); }
+.task-meta { font-size:10.5px; color:var(--text2); margin-top:2px; display:flex;gap:8px;align-items:center; }
+.task-assignee {
+  display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text2);
+}
+.mini-avatar {
+  width:18px;height:18px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:8px;font-weight:600;color:#fff;flex-shrink:0;
+}
+
+/* ─── Document rows ─── */
+.doc-item {
+  display:flex; align-items:center; gap:12px;
+  padding:10px 14px; border-bottom:1px solid var(--border);
+}
+.doc-item:last-child { border-bottom:none; }
+.doc-item:hover { background:var(--surface2); }
+.doc-icon {
+  width:32px;height:32px;border-radius:6px;
+  background:var(--surface2); border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  font-size:16px; flex-shrink:0;
+}
+.doc-name { font-size:13px; color:var(--ink); font-weight:500; }
+.doc-meta { font-size:11px; color:var(--text2); margin-top:1px; }
+.doc-size { font-family:var(--mono); font-size:10px; color:var(--text3); margin-left:auto; }
+
+/* ─── Activity timeline ─── */
+.activity-item { display:flex;gap:12px;padding:8px 0; }
+.act-icon {
+  width:28px;height:28px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;flex-shrink:0;
+  background:var(--surface2);border:1px solid var(--border);
+  position:relative;
+}
+.act-icon::after {
+  content:'';position:absolute;
+  width:1px;height:calc(100% + 10px);background:var(--border);
+  left:50%;top:100%;transform:translateX(-50%);
+}
+.activity-item:last-child .act-icon::after { display:none; }
+.act-text { font-size:12.5px; color:var(--text); line-height:1.5; flex:1; padding-top:4px; }
+.act-text strong { color:var(--ink); }
+.act-time { font-family:var(--mono); font-size:10px; color:var(--text3); margin-top:1px; }
+
+/* ─── Detail page ─── */
+.record-detail-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 20px 28px;
+}
+.rdh-top { display:flex;align-items:flex-start;gap:16px;justify-content:space-between; }
+.rdh-id { font-family:var(--mono);font-size:10px;color:var(--text2);margin-bottom:4px; }
+.rdh-title { font-family:var(--display);font-size:22px;font-weight:600;color:var(--ink);letter-spacing:-0.02em;line-height:1.2; }
+.rdh-client { font-size:13px;color:var(--text2);margin-top:4px; }
+.rdh-actions { display:flex;gap:8px;align-items:flex-start;flex-shrink:0; }
+
+.record-content { display:grid;grid-template-columns:1fr 320px;gap:0; }
+.record-main { padding:22px 28px;border-right:1px solid var(--border); }
+.record-side { padding:20px; background:var(--surface2); }
+
+/* ─── Stage progression (detail) ─── */
+.stage-progression { display:flex; align-items:center; gap:0; margin:20px 0; overflow-x:auto; }
+.sp-item { display:flex;flex-direction:column;align-items:center;gap:6px;min-width:80px; }
+.sp-circle {
+  width:32px;height:32px;border-radius:50%;
+  border:2px solid var(--border2);
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;background:var(--surface);
+  transition:all 0.2s;
+}
+.sp-circle.done { background:var(--sage2);border-color:var(--sage2);color:#fff; }
+.sp-circle.active { border-color:var(--amber);color:var(--amber);background:rgba(201,122,42,0.06); }
+.sp-label { font-family:var(--mono);font-size:8.5px;text-align:center;color:var(--text2);letter-spacing:0.05em;line-height:1.3; }
+.sp-label.done { color:var(--sage2); }
+.sp-label.active { color:var(--amber); }
+.sp-connector { width:24px;height:2px;background:var(--border);flex-shrink:0;align-self:center;margin-bottom:20px; }
+.sp-connector.done { background:var(--sage2); }
+
+/* ─── Tabs ─── */
+.tabs { display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:20px; }
+.tab {
+  padding:9px 16px;
+  font-size:13px;font-weight:500;color:var(--text2);
+  cursor:pointer;border-bottom:2px solid transparent;
+  transition:all 0.15s;
+}
+.tab:hover { color:var(--text); }
+.tab.active { color:var(--ink);border-bottom-color:var(--ink); }
+
+/* ─── Input / form ─── */
+.form-grid { display:grid;grid-template-columns:1fr 1fr;gap:16px; }
+.form-field { display:flex;flex-direction:column;gap:5px; }
+.form-field label { font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:0.1em;color:var(--text2); }
+.form-input {
+  background:var(--surface);
+  border:1px solid var(--border2);
+  border-radius:6px;
+  padding:8px 12px;
+  font-size:13px;color:var(--ink);
+  font-family:var(--body);
+  outline:none;transition:border-color 0.15s;
+  width:100%;
+}
+.form-input:focus { border-color:var(--amber); }
+.form-input::placeholder { color:var(--text3); }
+select.form-input { cursor:pointer; }
+
+/* ─── Users ─── */
+.user-row {
+  display:flex;align-items:center;gap:12px;
+  padding:12px 0;border-bottom:1px solid var(--border);
+}
+.user-row:last-child{border-bottom:none;}
+.user-avatar {
+  width:34px;height:34px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--display);font-size:13px;font-weight:600;color:#fff;flex-shrink:0;
+}
+.user-name { font-size:13px;font-weight:600;color:var(--ink); }
+.user-email { font-size:11px;color:var(--text2);font-family:var(--mono); }
+.user-records { font-size:11px;color:var(--text2);margin-left:auto; }
+
+/* ─── Upload drop zone ─── */
+.drop-zone {
+  border:2px dashed var(--border2);
+  border-radius:8px;
+  padding:28px;
+  text-align:center;
+  cursor:pointer;
+  transition:all 0.15s;
+  background:var(--surface2);
+}
+.drop-zone:hover { border-color:var(--amber);background:rgba(201,122,42,0.03); }
+.drop-zone-icon { font-size:28px;margin-bottom:8px;opacity:0.4; }
+.drop-zone-label { font-size:13px;color:var(--text2); }
+.drop-zone-sub { font-family:var(--mono);font-size:10px;color:var(--text3);margin-top:4px; }
+
+/* ─── Notification ─── */
+#toast {
+  position:fixed;bottom:24px;right:24px;
+  background:var(--ink);color:#fff;
+  padding:10px 18px;border-radius:8px;
+  font-size:13px;
+  transform:translateY(60px);opacity:0;
+  transition:all 0.3s;z-index:999;
+  box-shadow:0 4px 16px rgba(0,0,0,0.2);
+}
+#toast.show { transform:none;opacity:1; }
+
+/* ─── Scrollbar ─── */
+::-webkit-scrollbar{width:4px;height:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px;}
+</style>
+</head>
+<body>
+
+<aside id="sidebar">
+  <div class="logo-wrap">
+    <div class="logo">Workflow<em>OS</em></div>
+    <div class="logo-version">V1 · INTERNAL PLATFORM</div>
+  </div>
+  <div class="workspace-selector">
+    <div class="ws-avatar">K</div>
+    <div class="ws-name">Karim Co.</div>
+    <div class="ws-chevron">⌄</div>
+  </div>
+  <nav>
+    <div class="nav-group">Core</div>
+    <div class="nav-item active" onclick="showView('dashboard',this)"><span class="nav-icon">⬛</span> Dashboard</div>
+    <div class="nav-item" onclick="showView('records',this)"><span class="nav-icon">📁</span> Records <span class="nav-count alert">4</span></div>
+    <div class="nav-item" onclick="showView('detail',this)"><span class="nav-icon">📄</span> Record Detail</div>
+    <div class="nav-group">Work</div>
+    <div class="nav-item" onclick="showView('tasks',this)"><span class="nav-icon">✓</span> Tasks <span class="nav-count">9</span></div>
+    <div class="nav-item" onclick="showView('documents',this)"><span class="nav-icon">🗂</span> Documents <span class="nav-count">12</span></div>
+    <div class="nav-group">Settings</div>
+    <div class="nav-item" onclick="showView('users',this)"><span class="nav-icon">👥</span> Users</div>
+    <div class="nav-item" onclick="showView('create',this)"><span class="nav-icon">＋</span> New Record</div>
+  </nav>
+  <div class="sidebar-user">
+    <div class="su-avatar">K</div>
+    <div>
+      <div class="su-name">Kashif I.</div>
+      <div class="su-role">admin</div>
+    </div>
+    <div class="su-badge">Admin</div>
+  </div>
+</aside>
+
+<main id="main">
+
+<!-- ═══ DASHBOARD ═══ -->
+<div class="view active" id="view-dashboard">
+  <div class="topbar">
+    <div>
+      <div class="topbar-title">Good morning, Kashif</div>
+      <div class="topbar-sub">Friday, 13 March 2026 · 4 active records</div>
+    </div>
+    <div class="topbar-actions">
+      <button class="btn btn-ghost" onclick="showView('records',document.querySelector('[onclick*=records]'))">All Records</button>
+      <button class="btn btn-primary" onclick="showView('create',document.querySelector('[onclick*=create]'))">+ New Record</button>
+    </div>
+  </div>
+  <div class="content">
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-label">Active Records</div>
+        <div class="stat-val">4</div>
+        <div class="stat-delta"><span>↑ 2</span> this week</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Awaiting Action</div>
+        <div class="stat-val amber">3</div>
+        <div class="stat-delta">Approval or docs needed</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Tasks Open</div>
+        <div class="stat-val sage">9</div>
+        <div class="stat-delta"><span>6</span> assigned to you</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Completed</div>
+        <div class="stat-val">7</div>
+        <div class="stat-delta">This month</div>
+      </div>
+    </div>
+
+    <div class="grid2">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Active Records</div>
+          <span class="tag tag-neutral">4 records</span>
+        </div>
+        <div style="overflow:hidden;border-radius:0 0 8px 8px;">
+          <table class="records-table" style="border:none;">
+            <thead><tr>
+              <th>Record</th><th>Stage</th><th>Progress</th><th>Due</th>
+            </tr></thead>
+            <tbody>
+              <tr class="clickable" onclick="showView('detail',document.querySelector('[onclick*=detail]'))">
+                <td><div class="rec-name">Acme Onboarding</div><div class="rec-client">Acme Corp</div></td>
+                <td><span class="status-badge sb-review"><span class="sb-dot"></span>Review</span></td>
+                <td style="width:90px;"><div class="prog-bar"><div class="prog-fill" style="width:40%"></div></div><div style="font-size:10px;color:var(--text2);margin-top:3px;">40%</div></td>
+                <td style="font-size:11px;color:var(--text2);font-family:var(--mono);">Mar 20</td>
+              </tr>
+              <tr class="clickable" onclick="showView('detail',document.querySelector('[onclick*=detail]'))">
+                <td><div class="rec-name">BlueRock Approval</div><div class="rec-client">BlueRock Ltd</div></td>
+                <td><span class="status-badge sb-approval"><span class="sb-dot"></span>Approval</span></td>
+                <td><div class="prog-bar"><div class="prog-fill" style="width:65%"></div></div><div style="font-size:10px;color:var(--text2);margin-top:3px;">65%</div></td>
+                <td style="font-size:11px;color:var(--text2);font-family:var(--mono);">Mar 18</td>
+              </tr>
+              <tr class="clickable" onclick="showView('detail',document.querySelector('[onclick*=detail]'))">
+                <td><div class="rec-name">Nova Client Intake</div><div class="rec-client">Nova Systems</div></td>
+                <td><span class="status-badge sb-intake"><span class="sb-dot"></span>Intake</span></td>
+                <td><div class="prog-bar"><div class="prog-fill" style="width:15%"></div></div><div style="font-size:10px;color:var(--text2);margin-top:3px;">15%</div></td>
+                <td style="font-size:11px;color:var(--text2);font-family:var(--mono);">Mar 28</td>
+              </tr>
+              <tr class="clickable" onclick="showView('detail',document.querySelector('[onclick*=detail]'))">
+                <td><div class="rec-name">Zenith Processing</div><div class="rec-client">Zenith Group</div></td>
+                <td><span class="status-badge sb-final"><span class="sb-dot"></span>Final</span></td>
+                <td><div class="prog-bar"><div class="prog-fill" style="width:83%"></div></div><div style="font-size:10px;color:var(--text2);margin-top:3px;">83%</div></td>
+                <td style="font-size:11px;color:var(--text2);font-family:var(--mono);">Mar 15</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:16px;">
+        <div class="card">
+          <div class="card-header"><div class="card-title">Upcoming Tasks</div><span class="tag tag-amber">3 due soon</span></div>
+          <div style="padding:0 14px;">
+            <div class="task-item">
+              <div class="task-check">○</div>
+              <div>
+                <div class="task-title">Send NDA to Acme Corp</div>
+                <div class="task-meta"><div class="task-assignee"><div class="mini-avatar" style="background:var(--sage);">K</div> Kashif</div> · Due today</div>
+              </div>
+              <span class="tag tag-rose">High</span>
+            </div>
+            <div class="task-item">
+              <div class="task-check">○</div>
+              <div>
+                <div class="task-title">Review BlueRock documents</div>
+                <div class="task-meta"><div class="task-assignee"><div class="mini-avatar" style="background:var(--sky);">S</div> Sara</div> · Due Mar 18</div>
+              </div>
+              <span class="tag tag-amber">Med</span>
+            </div>
+            <div class="task-item">
+              <div class="task-check done">✓</div>
+              <div>
+                <div class="task-title done">Initial intake call — Zenith</div>
+                <div class="task-meta">Completed yesterday</div>
+              </div>
+              <span class="tag tag-sage">Done</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><div class="card-title">Recent Documents</div></div>
+          <div style="padding:0;">
+            <div class="doc-item">
+              <div class="doc-icon">📄</div>
+              <div><div class="doc-name">Acme_NDA_v2.pdf</div><div class="doc-meta">Acme Onboarding · uploaded 1h ago</div></div>
+              <div class="doc-size">84KB</div>
+            </div>
+            <div class="doc-item">
+              <div class="doc-icon">📊</div>
+              <div><div class="doc-name">BlueRock_Financials.xlsx</div><div class="doc-meta">BlueRock Approval · uploaded 3h ago</div></div>
+              <div class="doc-size">212KB</div>
+            </div>
+            <div class="doc-item">
+              <div class="doc-icon">📝</div>
+              <div><div class="doc-name">Nova_Intake_Form.pdf</div><div class="doc-meta">Nova Client Intake · uploaded yesterday</div></div>
+              <div class="doc-size">46KB</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══ RECORDS LIST ═══ -->
+<div class="view" id="view-records">
+  <div class="topbar">
+    <div>
+      <div class="topbar-title">Records</div>
+      <div class="topbar-sub">All active and completed workflow records</div>
+    </div>
+    <div class="topbar-actions">
+      <button class="btn btn-ghost">Filter</button>
+      <button class="btn btn-primary" onclick="showView('create',document.querySelector('[onclick*=create]'))">+ New Record</button>
+    </div>
+  </div>
+  <div class="content">
+    <div class="card">
+      <table class="records-table">
+        <thead><tr>
+          <th>ID</th><th>Record / Client</th><th>Stage</th><th>Priority</th><th>Owner</th><th>Progress</th><th>Due</th><th>Tasks</th>
+        </tr></thead>
+        <tbody>
+          <tr class="clickable" onclick="showView('detail',document.querySelector('[onclick*=detail]'))">
+            <td class="rec-id">#WF-001</td>
+            <td><div class="rec-name">Acme Onboarding</div><div class="rec-client">Acme Corp</div></td>
+            <td><span class="status-badge sb-review"><span class="sb-dot"></span>Review</span></td>
+            <td><span class="pri-dot pri-high"></span> High</td>
+            <td><div class="task-assignee" style="font-size:12px;"><div class="mini-avatar" style="background:var(--sage);">K</div> Kashif</div></td>
+            <td style="width:100px;"><div class="prog-bar"><div class="prog-fill" style="width:40%"></div></div><div style="font-size:10px;color:var(--text2);margin-top:2px;">40%</div></td>
+            <td style="font-family:var(--mono);font-size:11px;color:var(--text2);">Mar 20</td>
+            <td style="font-size:12px;color:var(--text2);">3/5</td>
+          </tr>
+          <tr class="clickable" onclick="showView('detail',document.querySelector('[onclick*=detail]'))">
+            <td class="rec-id">#WF-002</td>
+            <td><div class="rec-name">BlueRock Approval Pack</div><div class="rec-client">BlueRock Ltd</div></td>
+            <td><span class="status-badge sb-approval"><span class="sb-dot"></span>Approval</span></td>
+            <td><span class="pri-dot pri-high"></span> High</td>
+            <td><div class="task-assignee" style="font-size:12px;"><div class="mini-avatar" style="background:var(--sky);">S</div> Sara</div></td>
+            <td><div class="prog-bar"><div class="prog-fill" style="width:65%"></div></div><div style="font-size:10px;color:var(--text2);margin-top:2px;">65%</div></td>
+            <td style="font-family:var(--mono);font-size:11px;color:var(--text2);">Mar 18</td>
+            <td style="font-size:12px;color:var(--text2);">4/6</td>
+          </tr>
+          <tr class="clickable" onclick="showView('detail',document.querySelector('[onclick*=detail]'))">
+            <td class="rec-id">#WF-003</td>
+            <td><div class="rec-name">Nova Client Intake</div><div class="rec-client">Nova Systems</div></td>
+            <td><span class="status-badge sb-intake"><span class="sb-dot"></span>Intake</span></td>
+            <td><span class="pri-dot pri-med"></span> Medium</td>
+            <td><div class="task-assignee" style="font-size:12px;"><div class="mini-avatar" style="background:var(--violet);">J</div> James</div></td>
+            <td><div class="prog-bar"><div class="prog-fill" style="width:15%"></div></div><div style="font-size:10px;color:var(--text2);margin-top:2px;">15%</div></td>
+            <td style="font-family:var(--mono);font-size:11px;color:var(--text2);">Mar 28</td>
+            <td style="font-size:12px;color:var(--text2);">1/4</td>
+          </tr>
+          <tr class="clickable" onclick="showView('detail',document.querySelector('[onclick*=detail]'))">
+            <td class="rec-id">#WF-004</td>
+            <td><div class="rec-name">Zenith Processing Case</div><div class="rec-client">Zenith Group</div></td>
+            <td><span class="status-badge sb-final"><span class="sb-dot"></span>Final Processing</span></td>
+            <td><span class="pri-dot pri-high"></span> High</td>
+            <td><div class="task-assignee" style="font-size:12px;"><div class="mini-avatar" style="background:var(--amber);">M</div> Maya</div></td>
+            <td><div class="prog-bar"><div class="prog-fill" style="width:83%"></div></div><div style="font-size:10px;color:var(--text2);margin-top:2px;">83%</div></td>
+            <td style="font-family:var(--mono);font-size:11px;color:var(--text2);">Mar 15</td>
+            <td style="font-size:12px;color:var(--text2);">2/3</td>
+          </tr>
+          <tr>
+            <td class="rec-id">#WF-000</td>
+            <td><div class="rec-name">Harris Partnership Setup</div><div class="rec-client">Harris Co.</div></td>
+            <td><span class="status-badge sb-completed"><span class="sb-dot"></span>Completed</span></td>
+            <td><span class="pri-dot pri-low"></span> Low</td>
+            <td><div class="task-assignee" style="font-size:12px;"><div class="mini-avatar" style="background:var(--sage);">K</div> Kashif</div></td>
+            <td><div class="prog-bar"><div class="prog-fill" style="width:100%;background:var(--sage2)"></div></div><div style="font-size:10px;color:var(--sage2);margin-top:2px;">100%</div></td>
+            <td style="font-family:var(--mono);font-size:11px;color:var(--text2);">Mar 10</td>
+            <td style="font-size:12px;color:var(--text2);">6/6 ✓</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══ RECORD DETAIL ═══ -->
+<div class="view" id="view-detail">
+  <div class="record-detail-header">
+    <div class="rdh-top">
+      <div>
+        <div class="rdh-id">#WF-001 · Created Mar 8, 2026</div>
+        <div class="rdh-title">Acme Onboarding</div>
+        <div class="rdh-client">Acme Corp · Owner: Kashif Ilyas · Due Mar 20, 2026</div>
+      </div>
+      <div class="rdh-actions">
+        <span class="status-badge sb-review" style="font-size:12px;"><span class="sb-dot"></span> Review</span>
+        <button class="btn btn-ghost">Edit</button>
+        <button class="btn btn-primary" onclick="advanceStage()">→ Advance Stage</button>
+      </div>
+    </div>
+    <div class="stage-progression" style="padding:16px 0 4px;">
+      <div class="sp-item"><div class="sp-circle done">✓</div><div class="sp-label done">Intake</div></div>
+      <div class="sp-connector done"></div>
+      <div class="sp-item"><div class="sp-circle active">●</div><div class="sp-label active">Review</div></div>
+      <div class="sp-connector"></div>
+      <div class="sp-item"><div class="sp-circle">3</div><div class="sp-label">Documents</div></div>
+      <div class="sp-connector"></div>
+      <div class="sp-item"><div class="sp-circle">4</div><div class="sp-label">Approval</div></div>
+      <div class="sp-connector"></div>
+      <div class="sp-item"><div class="sp-circle">5</div><div class="sp-label">Final</div></div>
+      <div class="sp-connector"></div>
+      <div class="sp-item"><div class="sp-circle">6</div><div class="sp-label">Completed</div></div>
+    </div>
+  </div>
+
+  <div class="record-content">
+    <div class="record-main">
+      <div class="tabs">
+        <div class="tab active" onclick="recTab('overview',this)">Overview</div>
+        <div class="tab" onclick="recTab('tasks',this)">Tasks (5)</div>
+        <div class="tab" onclick="recTab('docs',this)">Documents (3)</div>
+        <div class="tab" onclick="recTab('activity',this)">Activity</div>
+      </div>
+
+      <!-- Overview tab -->
+      <div id="recTab-overview">
+        <div class="grid2" style="margin-bottom:18px;">
+          <div><div style="font-family:var(--mono);font-size:9px;color:var(--text2);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:4px;">Description</div>
+          <div style="font-size:13px;color:var(--text);line-height:1.6;">Full onboarding process for new enterprise client Acme Corp. Includes NDA execution, document collection, account setup, and initial review meeting.</div></div>
+          <div class="grid2" style="gap:10px;">
+            <div><div style="font-family:var(--mono);font-size:9px;color:var(--text2);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:4px;">Priority</div><span class="tag tag-rose">High</span></div>
+            <div><div style="font-family:var(--mono);font-size:9px;color:var(--text2);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:4px;">Progress</div><div style="font-family:var(--display);font-size:20px;font-weight:600;color:var(--ink);">40%</div></div>
+          </div>
+        </div>
+        <div class="prog-bar" style="height:8px;margin-bottom:20px;"><div class="prog-fill" id="detailProg" style="width:40%;background:linear-gradient(90deg,var(--sage2),var(--sage));"></div></div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">
+          <div class="card" style="padding:12px 14px;">
+            <div class="stat-label">Tasks</div>
+            <div style="font-family:var(--display);font-size:20px;font-weight:600;color:var(--ink);">3/5</div>
+            <div class="stat-delta">2 remaining</div>
+          </div>
+          <div class="card" style="padding:12px 14px;">
+            <div class="stat-label">Documents</div>
+            <div style="font-family:var(--display);font-size:20px;font-weight:600;color:var(--ink);">3</div>
+            <div class="stat-delta">All uploaded</div>
+          </div>
+          <div class="card" style="padding:12px 14px;">
+            <div class="stat-label">Stage</div>
+            <div style="font-size:13px;font-weight:600;color:var(--amber);margin-top:4px;">2 of 6</div>
+            <div class="stat-delta">Review</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tasks tab -->
+      <div id="recTab-tasks" style="display:none;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+          <div style="font-size:12px;color:var(--text2);">5 tasks · 3 completed</div>
+          <button class="btn btn-ghost" onclick="toast('Task added')">+ Add Task</button>
+        </div>
+        <div class="task-item">
+          <div class="task-check done">✓</div>
+          <div style="flex:1;">
+            <div class="task-title done">Send welcome email to client contact</div>
+            <div class="task-meta"><div class="task-assignee"><div class="mini-avatar" style="background:var(--sage);">K</div> Kashif</div> · Completed Mar 9</div>
+          </div>
+          <span class="tag tag-sage">Done</span>
+        </div>
+        <div class="task-item">
+          <div class="task-check done">✓</div>
+          <div style="flex:1;">
+            <div class="task-title done">Initial intake call scheduled and completed</div>
+            <div class="task-meta"><div class="task-assignee"><div class="mini-avatar" style="background:var(--sky);">S</div> Sara</div> · Completed Mar 11</div>
+          </div>
+          <span class="tag tag-sage">Done</span>
+        </div>
+        <div class="task-item">
+          <div class="task-check done">✓</div>
+          <div style="flex:1;">
+            <div class="task-title done">Request NDA signature</div>
+            <div class="task-meta"><div class="task-assignee"><div class="mini-avatar" style="background:var(--sage);">K</div> Kashif</div> · Completed Mar 12</div>
+          </div>
+          <span class="tag tag-sage">Done</span>
+        </div>
+        <div class="task-item">
+          <div class="task-check" onclick="this.classList.toggle('done');this.textContent=this.classList.contains('done')?'✓':'';toast('Task updated')">○</div>
+          <div style="flex:1;">
+            <div class="task-title">Review submitted documents</div>
+            <div class="task-meta"><div class="task-assignee"><div class="mini-avatar" style="background:var(--sage);">K</div> Kashif</div> · Due Mar 15 <span style="color:var(--rose);">· Overdue</span></div>
+          </div>
+          <span class="tag tag-rose">High</span>
+        </div>
+        <div class="task-item">
+          <div class="task-check" onclick="this.classList.toggle('done');this.textContent=this.classList.contains('done')?'✓':'';toast('Task updated')">○</div>
+          <div style="flex:1;">
+            <div class="task-title">Send NDA to Acme Corp legal team</div>
+            <div class="task-meta"><div class="task-assignee"><div class="mini-avatar" style="background:var(--sage);">K</div> Kashif</div> · Due Mar 20</div>
+          </div>
+          <span class="tag tag-amber">Medium</span>
+        </div>
+      </div>
+
+      <!-- Docs tab -->
+      <div id="recTab-docs" style="display:none;">
+        <div class="drop-zone" style="margin-bottom:14px;" onclick="toast('File upload simulated')">
+          <div class="drop-zone-icon">📎</div>
+          <div class="drop-zone-label">Click to upload or drag files here</div>
+          <div class="drop-zone-sub">PDF, DOCX, XLSX · Max 20MB</div>
+        </div>
+        <div class="doc-item">
+          <div class="doc-icon">📄</div>
+          <div style="flex:1;"><div class="doc-name">Acme_NDA_v2.pdf</div><div class="doc-meta">Uploaded by Kashif · Mar 12, 2026</div></div>
+          <div class="doc-size">84KB</div>
+          <span class="tag tag-sky" style="margin-left:10px;">NDA</span>
+        </div>
+        <div class="doc-item">
+          <div class="doc-icon">📝</div>
+          <div style="flex:1;"><div class="doc-name">Acme_IntakeForm.pdf</div><div class="doc-meta">Uploaded by Sara · Mar 10, 2026</div></div>
+          <div class="doc-size">46KB</div>
+          <span class="tag tag-violet" style="margin-left:10px;">Intake</span>
+        </div>
+        <div class="doc-item">
+          <div class="doc-icon">📊</div>
+          <div style="flex:1;"><div class="doc-name">Acme_Requirements.xlsx</div><div class="doc-meta">Uploaded by Kashif · Mar 11, 2026</div></div>
+          <div class="doc-size">130KB</div>
+          <span class="tag tag-amber" style="margin-left:10px;">Spec</span>
+        </div>
+      </div>
+
+      <!-- Activity tab -->
+      <div id="recTab-activity" style="display:none;padding-top:4px;">
+        <div class="activity-item"><div class="act-icon">📁</div><div><div class="act-text"><strong>Record created</strong> by Kashif Ilyas</div><div class="act-time">Mar 8, 2026 · 09:14</div></div></div>
+        <div class="activity-item"><div class="act-icon">✓</div><div><div class="act-text">Task <strong>"Send welcome email"</strong> completed by Kashif</div><div class="act-time">Mar 9 · 10:32</div></div></div>
+        <div class="activity-item"><div class="act-icon">📎</div><div><div class="act-text">Document <strong>Acme_IntakeForm.pdf</strong> uploaded by Sara</div><div class="act-time">Mar 10 · 14:05</div></div></div>
+        <div class="activity-item"><div class="act-icon">→</div><div><div class="act-text">Stage advanced from <strong>Intake</strong> to <strong>Review</strong> by Kashif</div><div class="act-time">Mar 12 · 09:00</div></div></div>
+        <div class="activity-item"><div class="act-icon">📎</div><div><div class="act-text">Document <strong>Acme_NDA_v2.pdf</strong> uploaded by Kashif</div><div class="act-time">Mar 12 · 11:30</div></div></div>
+        <div class="activity-item"><div class="act-icon">✓</div><div><div class="act-text">Task <strong>"Request NDA signature"</strong> completed</div><div class="act-time">Mar 12 · 15:48</div></div></div>
+      </div>
+    </div>
+
+    <!-- Side panel -->
+    <div class="record-side">
+      <div style="font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:0.1em;color:var(--text2);margin-bottom:12px;">Record Details</div>
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div><div style="font-family:var(--mono);font-size:9px;color:var(--text2);margin-bottom:3px;text-transform:uppercase;letter-spacing:0.08em;">Client</div><div style="font-size:13px;color:var(--ink);">Acme Corp</div></div>
+        <div><div style="font-family:var(--mono);font-size:9px;color:var(--text2);margin-bottom:3px;text-transform:uppercase;letter-spacing:0.08em;">Owner</div><div class="task-assignee" style="font-size:12px;"><div class="mini-avatar" style="background:var(--sage);">K</div> Kashif Ilyas</div></div>
+        <div><div style="font-family:var(--mono);font-size:9px;color:var(--text2);margin-bottom:3px;text-transform:uppercase;letter-spacing:0.08em;">Priority</div><span class="tag tag-rose">High</span></div>
+        <div><div style="font-family:var(--mono);font-size:9px;color:var(--text2);margin-bottom:3px;text-transform:uppercase;letter-spacing:0.08em;">Due Date</div><div style="font-size:13px;color:var(--ink);">March 20, 2026</div></div>
+        <div><div style="font-family:var(--mono);font-size:9px;color:var(--text2);margin-bottom:3px;text-transform:uppercase;letter-spacing:0.08em;">Current Stage</div><span class="status-badge sb-review" style="font-size:11px;"><span class="sb-dot"></span>Review</span></div>
+        <hr style="border:none;border-top:1px solid var(--border);">
+        <div>
+          <div style="font-family:var(--mono);font-size:9px;color:var(--text2);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.08em;">Workflow Progress</div>
+          <div style="display:flex;flex-direction:column;gap:6px;">
+            <div style="display:flex;align-items:center;gap:8px;font-size:11.5px;"><span style="color:var(--sage2);">✓</span> Intake<span style="margin-left:auto;font-family:var(--mono);font-size:9px;color:var(--text3);">Mar 8</span></div>
+            <div style="display:flex;align-items:center;gap:8px;font-size:11.5px;color:var(--amber);font-weight:500;"><span>→</span> Review<span style="margin-left:auto;font-family:var(--mono);font-size:9px;">Active</span></div>
+            <div style="display:flex;align-items:center;gap:8px;font-size:11.5px;color:var(--text3);"><span>○</span> Documents Received</div>
+            <div style="display:flex;align-items:center;gap:8px;font-size:11.5px;color:var(--text3);"><span>○</span> Approval</div>
+            <div style="display:flex;align-items:center;gap:8px;font-size:11.5px;color:var(--text3);"><span>○</span> Final Processing</div>
+            <div style="display:flex;align-items:center;gap:8px;font-size:11.5px;color:var(--text3);"><span>○</span> Completed</div>
+          </div>
+        </div>
+        <hr style="border:none;border-top:1px solid var(--border);">
+        <div><div style="font-family:var(--mono);font-size:9px;color:var(--text2);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.08em;">Collaborators</div>
+          <div style="display:flex;flex-direction:column;gap:6px;">
+            <div class="task-assignee" style="font-size:12px;"><div class="mini-avatar" style="background:var(--sage);">K</div> Kashif · Admin</div>
+            <div class="task-assignee" style="font-size:12px;"><div class="mini-avatar" style="background:var(--sky);">S</div> Sara · Collaborator</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══ TASKS ═══ -->
+<div class="view" id="view-tasks">
+  <div class="topbar">
+    <div><div class="topbar-title">Tasks</div><div class="topbar-sub">All tasks across active records</div></div>
+    <div class="topbar-actions"><button class="btn btn-primary" onclick="toast('Task created')">+ Add Task</button></div>
+  </div>
+  <div class="content">
+    <div class="grid2">
+      <div class="card">
+        <div class="card-header"><div class="card-title">To Do</div><span class="tag tag-amber">4 tasks</span></div>
+        <div style="padding:0 14px;">
+          <div class="task-item">
+            <div class="task-check" onclick="this.classList.toggle('done');this.textContent=this.classList.contains('done')?'✓':'';toast('Task moved to done')">○</div>
+            <div style="flex:1;"><div class="task-title">Send NDA to Acme Corp</div><div class="task-meta"><div class="task-assignee"><div class="mini-avatar" style="background:var(--sage);">K</div>Kashif</div> · #WF-001</div></div>
+            <span class="tag tag-rose">High</span>
+          </div>
+          <div class="task-item">
+            <div class="task-check" onclick="this.classList.toggle('done');this.textContent=this.classList.contains('done')?'✓':'';toast('Task moved to done')">○</div>
+            <div style="flex:1;"><div class="task-title">Review BlueRock financial documents</div><div class="task-meta"><div class="task-assignee"><div class="mini-avatar" style="background:var(--sky);">S</div>Sara</div> · #WF-002</div></div>
+            <span class="tag tag-amber">Med</span>
+          </div>
+          <div class="task-item">
+            <div class="task-check" onclick="this.classList.toggle('done');this.textContent=this.classList.contains('done')?'✓':'';toast('Task moved to done')">○</div>
+            <div style="flex:1;"><div class="task-title">Nova: schedule discovery call</div><div class="task-meta"><div class="task-assignee"><div class="mini-avatar" style="background:var(--violet);">J</div>James</div> · #WF-003</div></div>
+            <span class="tag tag-neutral">Low</span>
+          </div>
+          <div class="task-item">
+            <div class="task-check" onclick="this.classList.toggle('done');this.textContent=this.classList.contains('done')?'✓':'';toast('Task moved to done')">○</div>
+            <div style="flex:1;"><div class="task-title">Zenith: final sign-off confirmation</div><div class="task-meta"><div class="task-assignee"><div class="mini-avatar" style="background:var(--amber);">M</div>Maya</div> · #WF-004</div></div>
+            <span class="tag tag-rose">High</span>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-title">Completed</div><span class="tag tag-sage">5 tasks</span></div>
+        <div style="padding:0 14px;">
+          <div class="task-item"><div class="task-check done">✓</div><div style="flex:1;"><div class="task-title done">Initial intake call — Zenith</div><div class="task-meta">Kashif · #WF-004 · Mar 12</div></div></div>
+          <div class="task-item"><div class="task-check done">✓</div><div style="flex:1;"><div class="task-title done">Send welcome email — Acme</div><div class="task-meta">Kashif · #WF-001 · Mar 9</div></div></div>
+          <div class="task-item"><div class="task-check done">✓</div><div style="flex:1;"><div class="task-title done">BlueRock: collect ID documents</div><div class="task-meta">Sara · #WF-002 · Mar 11</div></div></div>
+          <div class="task-item"><div class="task-check done">✓</div><div style="flex:1;"><div class="task-title done">Nova intake form sent to client</div><div class="task-meta">James · #WF-003 · Mar 10</div></div></div>
+          <div class="task-item"><div class="task-check done">✓</div><div style="flex:1;"><div class="task-title done">Acme: initial intake call</div><div class="task-meta">Sara · #WF-001 · Mar 11</div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══ DOCUMENTS ═══ -->
+<div class="view" id="view-documents">
+  <div class="topbar">
+    <div><div class="topbar-title">Document Hub</div><div class="topbar-sub">All files associated with workflow records</div></div>
+    <div class="topbar-actions">
+      <button class="btn btn-ghost">Filter by Record</button>
+      <button class="btn btn-primary" onclick="toast('Upload simulated')">↑ Upload File</button>
+    </div>
+  </div>
+  <div class="content">
+    <div class="drop-zone mt16" style="margin-bottom:20px;" onclick="toast('File upload dialog opened')">
+      <div class="drop-zone-icon">📎</div>
+      <div class="drop-zone-label">Drag files here or click to upload</div>
+      <div class="drop-zone-sub">Attach to any record · PDF, DOCX, XLSX, PNG</div>
+    </div>
+    <div class="card" style="padding:0;overflow:hidden;">
+      <table class="records-table">
+        <thead><tr><th>File</th><th>Record</th><th>Type</th><th>Uploaded By</th><th>Date</th><th>Size</th></tr></thead>
+        <tbody>
+          <tr><td><div style="display:flex;align-items:center;gap:10px;"><span style="font-size:20px;">📄</span><div class="rec-name">Acme_NDA_v2.pdf</div></div></td><td><span class="tag tag-sky">#WF-001</span></td><td><span class="tag tag-neutral">NDA</span></td><td><div class="task-assignee" style="font-size:12px;"><div class="mini-avatar" style="background:var(--sage);">K</div>Kashif</div></td><td style="font-family:var(--mono);font-size:11px;color:var(--text2);">Mar 12</td><td class="doc-size">84KB</td></tr>
+          <tr><td><div style="display:flex;align-items:center;gap:10px;"><span style="font-size:20px;">📊</span><div class="rec-name">BlueRock_Financials.xlsx</div></div></td><td><span class="tag tag-sky">#WF-002</span></td><td><span class="tag tag-neutral">Financial</span></td><td><div class="task-assignee" style="font-size:12px;"><div class="mini-avatar" style="background:var(--sky);">S</div>Sara</div></td><td style="font-family:var(--mono);font-size:11px;color:var(--text2);">Mar 13</td><td class="doc-size">212KB</td></tr>
+          <tr><td><div style="display:flex;align-items:center;gap:10px;"><span style="font-size:20px;">📝</span><div class="rec-name">Nova_Intake_Form.pdf</div></div></td><td><span class="tag tag-sky">#WF-003</span></td><td><span class="tag tag-neutral">Intake</span></td><td><div class="task-assignee" style="font-size:12px;"><div class="mini-avatar" style="background:var(--violet);">J</div>James</div></td><td style="font-family:var(--mono);font-size:11px;color:var(--text2);">Mar 10</td><td class="doc-size">46KB</td></tr>
+          <tr><td><div style="display:flex;align-items:center;gap:10px;"><span style="font-size:20px;">📑</span><div class="rec-name">Zenith_ContractDraft.pdf</div></div></td><td><span class="tag tag-sky">#WF-004</span></td><td><span class="tag tag-neutral">Contract</span></td><td><div class="task-assignee" style="font-size:12px;"><div class="mini-avatar" style="background:var(--amber);">M</div>Maya</div></td><td style="font-family:var(--mono);font-size:11px;color:var(--text2);">Mar 11</td><td class="doc-size">98KB</td></tr>
+          <tr><td><div style="display:flex;align-items:center;gap:10px;"><span style="font-size:20px;">🖼</span><div class="rec-name">Acme_CompanyProfile.png</div></div></td><td><span class="tag tag-sky">#WF-001</span></td><td><span class="tag tag-neutral">Media</span></td><td><div class="task-assignee" style="font-size:12px;"><div class="mini-avatar" style="background:var(--sky);">S</div>Sara</div></td><td style="font-family:var(--mono);font-size:11px;color:var(--text2);">Mar 9</td><td class="doc-size">340KB</td></tr>
+          <tr><td><div style="display:flex;align-items:center;gap:10px;"><span style="font-size:20px;">📊</span><div class="rec-name">Acme_Requirements.xlsx</div></div></td><td><span class="tag tag-sky">#WF-001</span></td><td><span class="tag tag-neutral">Spec</span></td><td><div class="task-assignee" style="font-size:12px;"><div class="mini-avatar" style="background:var(--sage);">K</div>Kashif</div></td><td style="font-family:var(--mono);font-size:11px;color:var(--text2);">Mar 11</td><td class="doc-size">130KB</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══ USERS ═══ -->
+<div class="view" id="view-users">
+  <div class="topbar">
+    <div><div class="topbar-title">Users & Settings</div><div class="topbar-sub">Manage team members and roles</div></div>
+    <div class="topbar-actions"><button class="btn btn-primary" onclick="toast('Invite sent')">+ Invite User</button></div>
+  </div>
+  <div class="content">
+    <div class="card" style="max-width:680px;">
+      <div class="card-header"><div class="card-title">Team Members</div><span class="tag tag-neutral">4 users</span></div>
+      <div style="padding:0 18px;">
+        <div class="user-row">
+          <div class="user-avatar" style="background:linear-gradient(135deg,var(--sage),var(--sky));">K</div>
+          <div><div class="user-name">Kashif Ilyas</div><div class="user-email">kashif@company.com</div></div>
+          <span class="tag tag-sage">Admin</span>
+          <div class="user-records">4 records</div>
+        </div>
+        <div class="user-row">
+          <div class="user-avatar" style="background:linear-gradient(135deg,var(--sky),var(--violet));">S</div>
+          <div><div class="user-name">Sara Ahmed</div><div class="user-email">sara@company.com</div></div>
+          <span class="tag tag-sky">Collaborator</span>
+          <div class="user-records">2 records</div>
+        </div>
+        <div class="user-row">
+          <div class="user-avatar" style="background:linear-gradient(135deg,var(--violet),var(--rose));">J</div>
+          <div><div class="user-name">James Miller</div><div class="user-email">james@company.com</div></div>
+          <span class="tag tag-sky">Collaborator</span>
+          <div class="user-records">1 record</div>
+        </div>
+        <div class="user-row">
+          <div class="user-avatar" style="background:linear-gradient(135deg,var(--amber),var(--rose));">M</div>
+          <div><div class="user-name">Maya Chen</div><div class="user-email">maya@company.com</div></div>
+          <span class="tag tag-sky">Collaborator</span>
+          <div class="user-records">1 record</div>
+        </div>
+      </div>
+    </div>
+    <div class="card mt20" style="max-width:680px;">
+      <div class="card-header"><div class="card-title">Role Permissions</div></div>
+      <div style="padding:14px 18px;">
+        <table style="width:100%;border-collapse:collapse;font-size:12.5px;">
+          <thead><tr>
+            <th style="text-align:left;padding:6px 10px;font-family:var(--mono);font-size:9px;letter-spacing:0.1em;color:var(--text2);border-bottom:1px solid var(--border);text-transform:uppercase;">Action</th>
+            <th style="text-align:center;padding:6px 10px;font-family:var(--mono);font-size:9px;color:var(--text2);border-bottom:1px solid var(--border);text-transform:uppercase;">Admin</th>
+            <th style="text-align:center;padding:6px 10px;font-family:var(--mono);font-size:9px;color:var(--text2);border-bottom:1px solid var(--border);text-transform:uppercase;">Collaborator</th>
+          </tr></thead>
+          <tbody>
+            <tr><td style="padding:8px 10px;border-bottom:1px solid var(--border);">Create records</td><td style="text-align:center;padding:8px 10px;border-bottom:1px solid var(--border);color:var(--sage2);">✓</td><td style="text-align:center;padding:8px 10px;border-bottom:1px solid var(--border);color:var(--text3);">—</td></tr>
+            <tr><td style="padding:8px 10px;border-bottom:1px solid var(--border);">Advance workflow stage</td><td style="text-align:center;padding:8px 10px;border-bottom:1px solid var(--border);color:var(--sage2);">✓</td><td style="text-align:center;padding:8px 10px;border-bottom:1px solid var(--border);color:var(--text3);">—</td></tr>
+            <tr><td style="padding:8px 10px;border-bottom:1px solid var(--border);">Upload documents</td><td style="text-align:center;padding:8px 10px;border-bottom:1px solid var(--border);color:var(--sage2);">✓</td><td style="text-align:center;padding:8px 10px;border-bottom:1px solid var(--border);color:var(--sage2);">✓</td></tr>
+            <tr><td style="padding:8px 10px;border-bottom:1px solid var(--border);">Update task status</td><td style="text-align:center;padding:8px 10px;border-bottom:1px solid var(--border);color:var(--sage2);">✓</td><td style="text-align:center;padding:8px 10px;border-bottom:1px solid var(--border);color:var(--sage2);">✓</td></tr>
+            <tr><td style="padding:8px 10px;border-bottom:1px solid var(--border);">Assign tasks to users</td><td style="text-align:center;padding:8px 10px;border-bottom:1px solid var(--border);color:var(--sage2);">✓</td><td style="text-align:center;padding:8px 10px;border-bottom:1px solid var(--border);color:var(--text3);">—</td></tr>
+            <tr><td style="padding:8px 10px;border-bottom:1px solid var(--border);">View all records</td><td style="text-align:center;padding:8px 10px;border-bottom:1px solid var(--border);color:var(--sage2);">✓</td><td style="text-align:center;padding:8px 10px;border-bottom:1px solid var(--border);color:var(--amber);">Assigned only</td></tr>
+            <tr><td style="padding:8px 10px;">Manage users</td><td style="text-align:center;padding:8px 10px;color:var(--sage2);">✓</td><td style="text-align:center;padding:8px 10px;color:var(--text3);">—</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══ CREATE RECORD ═══ -->
+<div class="view" id="view-create">
+  <div class="topbar">
+    <div><div class="topbar-title">New Record</div><div class="topbar-sub">Create a new workflow record</div></div>
+    <div class="topbar-actions">
+      <button class="btn btn-ghost" onclick="showView('records',document.querySelector('[onclick*=records]'))">Cancel</button>
+      <button class="btn btn-primary" onclick="createRecord()">Create Record</button>
+    </div>
+  </div>
+  <div class="content" style="max-width:700px;">
+    <div class="card">
+      <div class="card-header"><div class="card-title">Record Information</div></div>
+      <div class="card-body">
+        <div class="form-grid">
+          <div class="form-field" style="grid-column:span 2;">
+            <label>Record Title</label>
+            <input class="form-input" type="text" placeholder="e.g. Acme Corp Onboarding" id="createTitle">
+          </div>
+          <div class="form-field">
+            <label>Client / Project Name</label>
+            <input class="form-input" type="text" placeholder="Client name">
+          </div>
+          <div class="form-field">
+            <label>Owner</label>
+            <select class="form-input">
+              <option>Kashif Ilyas</option>
+              <option>Sara Ahmed</option>
+              <option>James Miller</option>
+              <option>Maya Chen</option>
+            </select>
+          </div>
+          <div class="form-field">
+            <label>Priority</label>
+            <select class="form-input">
+              <option>High</option>
+              <option>Medium</option>
+              <option>Low</option>
+            </select>
+          </div>
+          <div class="form-field">
+            <label>Due Date</label>
+            <input class="form-input" type="date">
+          </div>
+          <div class="form-field" style="grid-column:span 2;">
+            <label>Description</label>
+            <textarea class="form-input" rows="3" placeholder="Describe this record and its goals..."></textarea>
+          </div>
+        </div>
+        <div style="margin-top:18px;padding-top:14px;border-top:1px solid var(--border);">
+          <div style="font-family:var(--mono);font-size:9px;color:var(--text2);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:10px;">Initial Stage</div>
+          <div class="stage-track">
+            <div class="stage-step active"><span class="check">→</span><div class="stage-step-label">Intake</div></div>
+            <div class="stage-step"><div class="stage-step-label">Review</div></div>
+            <div class="stage-step"><div class="stage-step-label">Docs</div></div>
+            <div class="stage-step"><div class="stage-step-label">Approval</div></div>
+            <div class="stage-step"><div class="stage-step-label">Final</div></div>
+            <div class="stage-step"><div class="stage-step-label">Done</div></div>
+          </div>
+          <div style="font-size:12px;color:var(--text2);margin-top:8px;">New records start at <strong style="color:var(--ink);">Intake</strong>. Advance stages manually from the record detail page.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<!-- Toast -->
+<div id="toast"></div>
+
+<script>
+function showView(id, el) {
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('view-'+id).classList.add('active');
+  if(el) el.classList.add('active');
+}
+
+function recTab(id, el) {
+  ['overview','tasks','docs','activity'].forEach(t=>{
+    const el2 = document.getElementById('recTab-'+t);
+    if(el2) el2.style.display = 'none';
+  });
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  const pane = document.getElementById('recTab-'+id);
+  if(pane) pane.style.display = 'block';
+  if(el) el.classList.add('active');
+}
+
+const stages = ['Intake','Review','Documents Received','Approval','Final Processing','Completed'];
+let currentStage = 1; // 0-indexed, start at Review
+function advanceStage() {
+  if(currentStage < stages.length - 1) {
+    currentStage++;
+    toast(`Stage advanced to: ${stages[currentStage]}`);
+    // Update the circles
+    const circles = document.querySelectorAll('.sp-circle');
+    const labels = document.querySelectorAll('.sp-label');
+    circles.forEach((c,i) => {
+      c.classList.remove('done','active');
+      labels[i].classList.remove('done','active');
+      if(i < currentStage) { c.classList.add('done'); c.textContent='✓'; labels[i].classList.add('done'); }
+      else if(i === currentStage) { c.classList.add('active'); c.textContent='●'; labels[i].classList.add('active'); }
+      else { c.textContent = i+1; }
+    });
+    // update progress
+    const pct = Math.round((currentStage / (stages.length-1)) * 100);
+    const pf = document.getElementById('detailProg');
+    if(pf) pf.style.width = pct+'%';
+  } else {
+    toast('Record is already at the final stage');
+  }
+}
+
+function createRecord() {
+  const title = document.getElementById('createTitle').value.trim();
+  if(!title) { toast('Please enter a record title'); return; }
+  toast(`Record "${title}" created successfully`);
+  setTimeout(()=>showView('records',document.querySelector('[onclick*=records]')),800);
+}
+
+let toastTimer;
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>el.classList.remove('show'), 2600);
+}
+</script>
+</body>
+</html>
